@@ -4,6 +4,7 @@
     xe vm-param-set uuid=$UUID xenstore-data:vm-data/gw=192.168.1.254
     xe vm-param-set uuid=$UUID xenstore-data:vm-data/nm=255.255.255.0
     xe vm-param-set uuid=$UUID xenstore-data:vm-data/ns=192.168.1.254
+    xe vm-param-set uuid=$UUID xenstore-data:vm-data/dm=mydomain.com
     xe vm-start uuid=$UUID
 
 ## Install scripts on guest VM:

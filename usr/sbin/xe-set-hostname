@@ -2,13 +2,25 @@
 XENSTOREREAD=`which xenstore-read`
 if [ -e $XENSTOREREAD ]; then
   NAME=`$XENSTOREREAD name`
+  DOMAIN=`$XENSTOREREAD vm-data/dm`
+
   [ "$NAME" = "" ] && exit 0
-  OLDNAME=`/bin/hostname -s`
-  DOMAIN=`/bin/hostname -d`
+  echo "$NAME" > /etc/hostname
+  /bin/hostname -F /etc/hostname
+
+  #if domain info wasn't passed in then dont alter the hosts file
   [ "$DOMAIN" = "" ] && exit 0
 
-	/bin/sed -i "s/$OLDNAME/$NAME/g" /etc/hosts
-  echo "$NAME.$DOMAIN" > /etc/hostname
-	/bin/hostname -F /etc/hostname
+  # read passed in IP address if it exists
+  IP=`$XENSTOREREAD vm-data/ip`
+  # otherwise just use the ip address that the machine has already
+  if [ $IP = "" ]; then IP=`ip addr list eth0 |grep "inet " |cut -d' ' -f6|cut -d/ -f1`; fi
+
+cat << EOF > /etc/hosts
+127.0.0.1	localhost
+$IP	$NAME.$DOMAIN	$NAME	
+EOF
+	
 fi
 exit 0
+

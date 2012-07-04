@@ -7,11 +7,13 @@ IP=`$XENSTOREREAD vm-data/ip`
 GW=`$XENSTOREREAD vm-data/gw`
 NM=`$XENSTOREREAD vm-data/nm`
 NS=`$XENSTOREREAD vm-data/ns`
+DM=`$XENSTOREREAD vm-data/dm`
 
 [ "$IP" = "" ] && exit 0
 [ "$GW" = "" ] && exit 0
 [ "$NM" = "" ] && exit 0
 [ "$NS" = "" ] && exit 0
+[ "$DM" = "" ] && exit 0
 
 cat << EOF > /etc/network/interfaces
 auto lo
@@ -23,10 +25,12 @@ iface eth0 inet static
         netmask $NM
         gateway $GW
         dns-nameservers $NS
+	dns-search $DM
 EOF
 
 # update hosts
-env HOSTNAME=`hostname -s` IP=$IP perl -pi -e 's/^(\d+\.\d+\.\d+\.\d+)(\s+$ENV{HOSTNAME})/$ENV{IP}$2/' /etc/hosts
+# host file is altered in xe-set-hostanme now
+#env HOSTNAME=`hostname -s` IP=$IP perl -pi -e 's/^(\d+\.\d+\.\d+\.\d+)(\s+$ENV{HOSTNAME})/$ENV{IP}$2/' /etc/hosts
 
 /etc/init.d/networking restart
 
